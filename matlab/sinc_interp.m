@@ -1,10 +1,19 @@
 function y = sinc_interp(x, M)
-% sinc_interp perform ideal bandlimited interpolation of a signal.
+%SINC_INTERP perform ideal bandlimited interpolation.
 %
 %   y = sinc_interp(x, M);
 %
-% x is input signal. M is interpolate factor. y is output signal. This function
-% append M-1 interpolated sample points at each origial point.
+% This function interpolate the real or complex samples signal x for an 
+% integer factor M. It increase the sample rate of x by insert M - 1 sample
+% between samples and at end. If x is a matrix, the function treats each 
+% column as separate sequence.
+%
+% x is input signal. M is interpolate factor. y is interpolated signal.
+% This function assume that the signal to interpolate, x, is 0 outside of
+% the given time interval and has been sampled at Nyquist frequency.
+%
+
+    narginchk(2,2);
 
     % Test if input is row vector
     if isrow(x)
