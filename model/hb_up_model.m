@@ -8,7 +8,7 @@ if isrow(x)
 end 
 
 x = upsample(x, 2);
-y = circ_filter(num, x) * 2;
+y = cfilter(num, x) * 2;
 y = circshift(y, -(length(num)-1)/2);
 
 if input_is_row
