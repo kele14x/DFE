@@ -1,57 +1,47 @@
-function vecy = cordic_rotation(vecx, ang, conf)
+function vecy = cordic_rotation(vecx, ang, varargin)
 % CORDIC_ROTATION rotates the vector (complex number) through the angle to yield
 % a new vector using CORDIC algorithm.
 %
-%   VECY = CORDIC_ROTATION(VECX, ANG)
-%   VECY = CORDIC_ROTATION(VECX, ANG, CONF)
+%   vecy = CORDIC_ROTATION(vecx, ang)
+%   vecy = CORDIC_ROTATION(vecx, ang, Name, Value)
 %
-% Inputs:
+% Input Arguments:
 %
-%   VECX is the complex matrix represents the vector before the rotation
-%
-%   ANG is the angle in radian to rotate. If ANG is positive, the rotation is
-%   counterclockwise, else the rotation is clockwise.
-%
-%   CONF is a structure to hold confurations for this model. Valid fields are:
-%     TODO: Add valid fields for CONF
+%   `vecx` is the complex matrix represents the vector before the rotation
+%   `ang` is the angle in radian to rotate. If `ang` is positive, the rotation
+%       is counterclockwise, else the rotation is clockwise.
+%   `Name` & 'Value` is a Name-Value pair to hold optional confurations for
+%       this model. Valid fields are:
+%       TODO: Add valid fields for CONF
 %
 % Outputs:
 %
-%   VECY is the complex matrix represents the output after the rotation
+%   `vecy` is the complex matrix represents the output after the rotation
 %
 % See also CORDIC_TRANSLATE.
 
 % Copyright 2020 kele14x
 
 %% Default Parameters
+p = inputParser;
 
-if ~exist('conf', 'var')
-    conf = [];
-end
+addParameter(p, 'CoarseRotation', true, @(x)(isscalar(x) && islogical(x)));
+addParameter(p, 'CompensationScaling', true, @(x)(isscalar(x) && islogical(x)));
+addParameter(p, 'Iterations', 6, @(x)(isscalar(x) && isnumeric(x)));
 
-if ~isfield(conf, 'CoarseRotation')
-    conf.CoarseRotation = true;
-end
-
-if ~isfield(conf, 'Iterations')
-    conf.Iterations = 6;
-end
-
-if ~isfield(conf, 'CompensationSacling')
-    conf.CompensationSacling = true;
-end
+parse(p, varargin{:});
 
 %% Pseudo-Rotation
 % Init iteration
 X = real(vecx);
 Y = imag(vecx);
-% ANG should be within the range [-pi, pi) this should be naturally for hardware 
+% ANG should be within the range [-pi, pi) this should be naturally for hardware
 ang = rem((ang + pi), 2*pi) - pi;
 
 % Coarse rotation expends input to all the circle (if not, input vector is
 % required within range [-99.883, 99.883] degree). To to coarse rotation, we
 % need to know which quadrant the angle is lie on.
-if conf.CoarseRotation
+if p.Results.CoarseRotation
     % If angle is at left quadrant, do coare rotation. Coarse rotation  is
     % rotate the vector for pi angle. The direction is not important, since
     % rotate for pi is rotate for -pi (reverse vector direction)
@@ -63,26 +53,24 @@ if conf.CoarseRotation
     ang(q3) = ang(q3) + pi;
 end
 
-for i = (0:conf.Iterations)
+for i = (0:p.Results.Iterations)
     % Rotation direction is -sgn(err). No speical handle is need for err is zero
     d = (ang >= 0) * 2 - 1;
     % Rseudo rotation is micro rotation without the length factor K
     temp = X;
     % Simulation the hardware truncate rounding mode
     % TODO: Add more rounding mode
-    X = (X - d .* Y / 2^i);
-    Y = (Y + d .* temp / 2^i);
+    X = floor(X - d .* Y / 2^i);
+    Y = floor(Y + d .* temp / 2^i);
     % TODO: Add more angle format, should be one to represent hardware optimaze
     ang = ang - d .* atan(1 / 2^i);
 end
 
-disp(ang * 180 / pi);
 %% Output
-
 vecy = X + 1j * Y;
 
-if conf.CompensationSacling
-    K = prod(1./sqrt(1+2.^(-2*(0:conf.Iterations))));
+if p.Results.CompensationScaling
+    K = prod(1./sqrt(1+2.^(-2*(0:p.Results.Iterations))));
     vecy = K * vecy;
 end
 

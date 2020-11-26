@@ -1,67 +1,59 @@
-function [mag, ang] = cordic_translate(vec, conf)
-% CORDIC_TRANSLATE rotates the vector around the circle until the imaginary
-% component equals zero using CORDIC algorithm
+function [mag, ang] = cordic_translate(vec, varargin)
+% CORDIC_TRANSLATE rotates the vector (complex number) around the circle until
+% the imaginary component equals zero using CORDIC algorithm.
 %
-%   [MAG, ANG] = cordic_translate(VEC)
-%   [MAG, ANG] = cordic_translate(VEC, CONF)
+%   [mag, ang] = cordic_translate(vec)
+%   [mag, ang] = cordic_translate(vec, Name, Value)
 %
-% Inputs:
+% Input Arguments:
 %
-%   VEC is the complex matrix represents the vector
-%
-%   CONF is a structure to hold confurations for this model. Valid fields are:
-%     CONF.CoarseRotation：
+%   `vec` is the complex matrix represents the vector
+%   `Name` & `Value` is Name-Value pair to specify optional comma-separated
+%   arguments for this model. Valid arguments are:
+%     'CoarseRotation'：
 %       T/F, do a coarse rotation for input vector
-%     CONF.Iterations:
+%     'Iterations':
 %       Scalar integer, number of CORDIC iterations
-%     CONF.CompensationSacling:
+%     'CompensationScaling':
 %       T/F, do compensation for magnitude scaling during pesudo-rotation before
 %       output
 %
-% Outputs:
+% Output Arguments:
 %
-%   MAG is magnitude of VEC
-%
-%   ANG is angle of VEC
+%   `mag` is magnitude of VEC
+%   `ang` is angle of VEC
 %
 % See also CORDIC_ROTATION.
 
 % Copyright 2020 kele14x
 
-%% Default Parameters
+%% Parse Arguments
+p = inputParser;
 
-if ~exist('conf', 'var')
-    conf = [];
-end
+addParameter(p, 'CoarseRotation', true, @(x)(isscalar(x) && islogical(x)));
+addParameter(p, 'CompensationScaling', true, @(x)(isscalar(x) && islogical(x)));
+addParameter(p, 'Iterations', 6, @(x)(isscalar(x) && isnumeric(x)));
 
-if ~isfield(conf, 'CoarseRotation')
-    conf.CoarseRotation = true;
-end
-
-if ~isfield(conf, 'Iterations')
-    conf.Iterations = 6;
-end
-
-if ~isfield(conf, 'CompensationSacling')
-    conf.CompensationSacling = true;
-end
+parse(p, varargin{:});
 
 %% Pseudo-Rotation
+% Coarse rotation expends input to all the circle (if not, input vector is
+% required within range [-99.883, 99.883] degree). To to coarse rotation, we
+% need to know which quadrant the vector is lie on. Then there are many ways to
+% do coarse rotation, way we did here is reverse the direction of vector at 2nd
+% and 3rd quadrant.
+if p.Results.CoarseRotation
+    q2 = (real(vec) < 0 & imag(vec) >= 0);
+    q3 = (real(vec) < 0 & imag(vec) <  0);
+    vec(q2 | q3) = -vec(q2 | q3);
+end
+
 % Init iteration
 mag = real(vec);
 err = imag(vec);
 ang = 0;
 
-% Coarse rotation expends input to all the circle (if not, input vector is
-% required within range [-99.883, 99.883] degree). To to coarse rotation, we
-% need to know which quadrant the vector is lie on.
-if conf.CoarseRotation
-    left = mag < 0;
-    mag(left) = -mag(left);
-    lower = err < 0;
-end
-
-for i = (0:conf.Iterations)
+for i = (0:p.Results.Iterations)
     % Rotation direction is -sgn(err). No speical handle is need for err is zero
     d = -2 * (err >= 0) + 1;
     % Rseudo rotation is micro rotation without the length factor K
@@ -75,15 +67,16 @@ for i = (0:conf.Iterations)
 end
 
 %% Output
-
-if conf.CompensationSacling
-    K = prod(1./sqrt(1+2.^(-2*(0:conf.Iterations))));
+% Comensation for vector length scaling
+if p.Results.CompensationScaling
+    K = prod(1./sqrt(1+2.^(-2*(0:p.Results.Iterations))));
     mag = K * mag;
 end
 
-if conf.CoarseRotation
-    ang(left & ~lower) =  pi - ang(left & ~lower);
-    ang(left &  lower) = -pi - ang(left &  lower);
+% If we do coarse rotation at input, we need to reverse the effect
+if p.Results.CoarseRotation
+    ang(q2) = ang(q2) + pi;
+    ang(q3) = ang(q3) - pi;
 end
 
 end
