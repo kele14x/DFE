@@ -57,7 +57,8 @@ err = imag(vec);
 for i = (0:p.Results.Iterations)
     % `d` is rotation direction, 1 is counterclockwise, -1 is clockwise. The 
     % rotation direction is -sign(err). For 0, we rotate counterclockwise.
-    d = -((r >= 0) * 2 - 1) .* ((err >= 0) * 2 - 1);
+    d = -((r >= 0) * 2 - 1) * ((err >= 0) * 2 - 1);
+    disp(d);
     % Rseudo rotation is micro rotation without the length factor K
     temp = r;
     % Simulation the hardware truncate rounding mode
@@ -83,13 +84,11 @@ end
 if p.Results.CompensationScaling
     K = prod(1./sqrt(1+2.^(-2*(0:p.Results.Iterations))));
     r = K * r;
-    r(sx) = -r(sx);
 end
 
 % Comensation for phase angle output
 if strcmp(p.Results.PhaseFormat, 'Radians')
-    theta(sx & sy) = theta(sx & sy) - pi;
-    theta(sx & ~sy) = theta(sx & ~sy) + pi;
+    theta(sx & sy) = theta(sx & sy)
 end
 
 end

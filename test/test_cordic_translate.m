@@ -11,23 +11,24 @@ rng(12345);
 vec = randi([-2^15, 2^15-1], sz) + 1j * randi([-2^15, 2^15-1], sz);
 
 %% Test
-[mag, ang] = cordic_translate(vec);
+[theta, r] = cordic_translate(vec, 'PhaseFormat', 'Radians');
+theta_ref = angle(vec);
+r_ref = abs(vec);
 
 %% Analysis result
 figure();
-stem(abs(vec));
+stem(r_ref);
 hold on;
-stem(mag);
-yyaxis right;
-stem(abs(vec) - mag);
+stem(r);
+stem(r_ref - r);
 legend('Input', 'Output', 'Error');
-fprintf('Magnitude error RMS is %.4f%%\n', rms(abs(vec)-mag)/rms(abs(vec))*100);
+fprintf('Magnitude error RMS is %.4f%%\n', rms(r_ref-r)/rms(r_ref)*100);
 
+%%
 figure();
-stem(angle(vec) * 180 / pi);
+stem(theta_ref * 180 / pi);
 hold on;
-stem(ang * 180 / pi);
-yyaxis right;
-stem((angle(vec) - ang) * 180 / pi);
+stem(theta * 180 / pi);
+stem((theta_ref - theta) * 180 / pi);
 legend('Input', 'Output', 'Error');
-fprintf('Angle error RMS is %.4f degree\n', rms(angle(vec)-ang) * 180 / pi);
+fprintf('Angle error RMS is %.4f degree\n', rms(theta_ref-theta) * 180 / pi);
