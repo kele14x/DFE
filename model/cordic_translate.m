@@ -2,8 +2,8 @@ function [theta, r] = cordic_translate(x, y, varargin)
 % CORDIC_TRANSLATE rotates the vector (x, y) around the circle until
 % the y component equals zero using CORDIC algorithm.
 %
-%   [mag, ang] = cordic_translate(x, y)
-%   [mag, ang] = cordic_translate(x, y, Name, Value)
+%   [theta, r] = cordic_translate(x, y)
+%   [theta, r] = cordic_translate(x, y, Name, Value)
 %
 % Input Arguments:
 %
@@ -13,7 +13,7 @@ function [theta, r] = cordic_translate(x, y, varargin)
 %     'Iterations':
 %       Scalar integer, number of CORDIC iterations
 %     'CompensationScaling':
-%       T/F, do compensation for magnitude scaling during pesudo-rotation before
+%       T/F, do compensation for magnitude scaling during pseudo-rotation before
 %       output
 %     'PhaseFormat':
 %       'Radians' or 'Binary'
@@ -53,11 +53,11 @@ end
 
 %% Pseudo-Rotation
 for i = (0:p.Results.Iterations-1)
-    % `d` is rotation direction, 1 is counterclockwise, -1 is clockwise. The 
+    % `d` is rotation direction, 1 is counterclockwise, -1 is clockwise. The
     % rotation direction is -sign(x*y). For 0, we rotate counterclockwise.
     d = xor(x < 0, y < 0);
     d = d * 2 - 1;
-    % Rseudo rotation is micro rotation without the length factor K
+    % Pseudo rotation is micro rotation without the length factor K
     temp = x;
     % Simulation the hardware truncate rounding mode
     x = x - d .* y / 2^i;
@@ -71,6 +71,7 @@ for i = (0:p.Results.Iterations-1)
     if strcmp(p.Results.PhaseFormat, 'Radians')
         % If we rotate clockwise, we log positive, and vice versa
         theta = theta - d .* atan(1 / 2^i);
+        disp(theta * 180 / pi);
     elseif strcmp(p.Results.PhaseFormat, 'Binary')
         %  If we rotate clockwise, we log '1', and vice versa
         theta = theta * 2 - (d - 1) / 2;
@@ -78,14 +79,14 @@ for i = (0:p.Results.Iterations-1)
 end
 
 %% Output
-% Comensation for vector length scaling
+% Compensation for vector length scaling
 if p.Results.CompensationScaling
     K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations - 1))));
     r = K * x;
     r(sx) = -r(sx);
 end
 
-% Comensation for phase angle output
+% Compensation for phase angle output
 if strcmp(p.Results.PhaseFormat, 'Radians')
     theta(sx & sy) = theta(sx & sy) - pi;
     theta(sx & ~sy) = theta(sx & ~sy) + pi;

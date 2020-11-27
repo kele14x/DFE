@@ -1,6 +1,22 @@
-function [theta] = cordic_bin2rad(bin, nIter)
+function theta = cordic_bin2rad(bin, nIter)
 % CORDIC_BIN2RAD converts phase angle from radians format to binary encode which
 % is suit for CORDIC algorithm.
+%
+%   theta = cordic_bin2rad(bin, nIter)
+%
+% Input Arguments:
+%
+%   `bin` in phase angle in binary format
+%
+%   `nIter` is number of iterations of CORDIC algorithm
+%
+% Output Arguments:
+%
+%   `theta` is phase angle in radians format
+%
+% See also CORDIC_RAD2BIN
+
+% Copyright 2020 kele14x
 
 % Know the matrix shape of input
 sz = size(bin);
@@ -17,7 +33,7 @@ reversed = bin(:,1);
 % Left bits are angle in atan(1/2^i)
 bin = bin(:, 2:end);
 
-% Add left bits togather to get the theta
+% Add left bits together to get the theta
 bin = bin * 2 - 1;
 t = meshgrid(0:size(bin,2)-1, 1:size(bin,1));
 theta = bin .* atan(1./2.^t);
@@ -33,4 +49,3 @@ theta(idx2) = theta(idx2) + pi;
 theta = reshape(theta, sz);
 
 end
-
