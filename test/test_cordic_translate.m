@@ -4,14 +4,25 @@ clearvars;
 close all;
 
 %% Generate test input
-nPts = 1000;
+nPts = 100;
 sz = [nPts, 1];
 
 rng(12345);
-vec = randi([-2^15, 2^15-1], sz) + 1j * randi([-2^15, 2^15-1], sz);
+vec = complex(randi([-2^15, 2^15-1], sz), randi([-2^15, 2^15-1], sz));
 
 %% Test
-[theta, r] = cordic_translate(vec, 'PhaseFormat', 'Radians');
+CompensationScaling = true;
+Iterations = 7;
+PhaseFormat = 'Binary';
+RoundMode = 'None';
+
+[thetab, r] = cordic_translate(real(vec), imag(vec), ...
+    'CompensationScaling', CompensationScaling, ...
+    'Iterations', Iterations, ...
+    'PhaseFormat', PhaseFormat, ...
+    'RoundMode', RoundMode);
+theta = cordic_bin2rad(thetab, Iterations);
+
 theta_ref = angle(vec);
 r_ref = abs(vec);
 
@@ -21,14 +32,13 @@ stem(r_ref);
 hold on;
 stem(r);
 stem(r_ref - r);
+title(sprintf('Magnitude Error (RMS = %.4f%%)', rms(r_ref-r)/rms(r_ref)*100));
 legend('Input', 'Output', 'Error');
-fprintf('Magnitude error RMS is %.4f%%\n', rms(r_ref-r)/rms(r_ref)*100);
 
-%%
 figure();
 stem(theta_ref * 180 / pi);
 hold on;
 stem(theta * 180 / pi);
 stem((theta_ref - theta) * 180 / pi);
+title(sprintf('Angle Error (RMS = %.4f degree)', rms(theta_ref-theta) * 180 / pi));
 legend('Input', 'Output', 'Error');
-fprintf('Angle error RMS is %.4f degree\n', rms(theta_ref-theta) * 180 / pi);
