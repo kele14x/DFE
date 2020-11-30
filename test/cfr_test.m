@@ -19,8 +19,9 @@ x = nco_model(x1, Fs, -50e6) + nco_model(x2, Fs, 50e6);
 x = x / rms(x) * sqrt(db2l(-15)) * 2^15;
 
 threshold = sqrt(db2l(-7.5)) * 2^15;
-%%
 
+x = x(1:245760);
+%%
 y = cfr_softclipping(x, threshold);
 
 %%

@@ -18,18 +18,18 @@ BW = p.Results.BandWidth;
 nHB1 = p.Results.Halfband1Order;
 
 % HB1 Coefficient
-hb1 = hb_design(nHB1, Fs * 2, BW/2);
+hb1 = hb_design(nHB1, Fs*2, BW/2);
 
 % CPW Coefficient
-cpw = fir_design(254, Fs, BW/2, BW/2+2e6);
+cpw = fir_design(254, Fs*2, BW/2, BW/2+2e6);
 cpw = cpw / max(cpw);
-cpw1 = cpw(2:2:end);
-cpw2 = cpw(1:2:end);
-delay = (254 - 2) / 4;
+cpw1 = [cpw(2:2:end)];
+cpw2 = [cpw(1:2:end)];
+delay = 63;
 
 %% Data Path
 
-%
+% Halfband UP2
 x2 = hb_up_model(x, hb1);
 
 [x2_thetab, x2_abs] = cordic_translate(real(x2), imag(x2), ...
@@ -37,6 +37,8 @@ x2 = hb_up_model(x, hb1);
     'CompensationScaling', true, ...
     'PhaseFormat', 'Binary', ...
     'RoundMode', 'None');
+x2_thetab_ref = angle(x2);
+x2_abs_ref = abs(x2);
 
 % Peak Detector
 % Peak is defined as sample exceed threshold and larger than neighbors
@@ -53,14 +55,17 @@ peak(~is_peak) = 0;
     'PhaseFormat', 'Binary', ...
     'RoundMode', 'None');
 peak = complex(peaki, peakq);
+
+% delta2 = circshift(cconv(cpw.', peak, length(peak)), -127);
 peak = reshape(peak, 2, []).';
 
 delta = zeros(size(peak));
 delta(:,1) = cconv(cpw1, peak(:,1), length(peak(:,1)));
 delta(:,2) = cconv(cpw2, peak(:,2), length(peak(:,2)));
-delta = sum(delta, 2);
 delta = circshift(delta, -delay); 
 
-y = x - delta;
+y = x;
+y = y - delta(:,1);
+y = y - delta(:,2);
 
 end
