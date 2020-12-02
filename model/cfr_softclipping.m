@@ -7,7 +7,7 @@ addParameter(p, 'Fs', 245.76e6, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'BandWidth', 198e6, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'Halfband1Order', 18, @(x)(isscalar(x) && isnumeric(x)));
 
-addParameter(p, 'CPW', 'Radians', @(x)(ismember(x, {'Radians', 'Binary'})));
+addParameter(p, 'CPW', [], @(x)(isnumeric(x) && isvector(x) || isempty(x)));
 addParameter(p, 'RoundMode', 'None', @(x)(ismember(x, {'Truncate', 'None'})));
 
 parse(p, varargin{:});
@@ -21,11 +21,16 @@ nHB1 = p.Results.Halfband1Order;
 hb1 = hb_design(nHB1, Fs*2, BW/2);
 
 % CPW Coefficient
-cpw = fir_design(254, Fs*2, BW/2, BW/2+2e6);
-cpw = cpw / max(cpw);
-cpw1 = [cpw(2:2:end)];
-cpw2 = [cpw(1:2:end)];
-delay = 63;
+if isempty(p.Results.CPW)
+    cpw = fir_design(254, Fs*2, BW/2, BW/2+2e6);
+    cpw = cpw / max(cpw);
+    cpw1 = cpw(2:2:end);
+    cpw2 = cpw(1:2:end);
+    delay = 63;
+else 
+    cpw = p.Results.CPW;
+    [~, delay] = max(cpw);
+end
 
 %% Data Path
 
@@ -37,8 +42,6 @@ x2 = hb_up_model(x, hb1);
     'CompensationScaling', true, ...
     'PhaseFormat', 'Binary', ...
     'RoundMode', 'None');
-x2_thetab_ref = angle(x2);
-x2_abs_ref = abs(x2);
 
 % Peak Detector
 % Peak is defined as sample exceed threshold and larger than neighbors
