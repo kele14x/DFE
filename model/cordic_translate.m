@@ -60,11 +60,14 @@ for i = (0:p.Results.Iterations-1)
     % Pseudo rotation is micro rotation without the length factor K
     temp = x;
     % Simulation the hardware truncate rounding mode
-    x = x - d .* y / 2^i;
-    y = y + d .* temp / 2^i;
     if strcmp(p.Results.RoundMode, 'Truncate')
-        x = floor(x);
-        y = floor(y);
+        x = x - d .* floor(y / 2^i);
+        y = y + d .* floor(temp / 2^i);
+        disp(x);
+%         disp(y);
+    else
+        x = x - d .* y / 2^i;
+        y = y + d .* temp / 2^i;
     end
 
     % Angle Log
@@ -79,11 +82,12 @@ for i = (0:p.Results.Iterations-1)
 end
 
 %% Output
+r = x;
+r(sx) = -r(sx);
 % Compensation for vector length scaling
 if p.Results.CompensationScaling
     K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations - 1))));
-    r = K * x;
-    r(sx) = -r(sx);
+    r = K * r;
 end
 
 % Compensation for phase angle output
