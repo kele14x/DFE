@@ -33,6 +33,7 @@ function [theta, r] = cordic_translate(x, y, varargin)
 p = inputParser;
 
 addParameter(p, 'CompensationScaling', true, @(x)(isscalar(x) && islogical(x)));
+addParameter(p, 'CompensationBins', 8, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'Iterations', 7, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'PhaseFormat', 'Radians', @(x)(ismember(x, {'Radians', 'Binary'})));
 addParameter(p, 'RoundMode', 'None', @(x)(ismember(x, {'Truncate', 'None'})));
@@ -63,8 +64,6 @@ for i = (0:p.Results.Iterations-1)
     if strcmp(p.Results.RoundMode, 'Truncate')
         x = x - d .* floor(y / 2^i);
         y = y + d .* floor(temp / 2^i);
-        disp(x);
-%         disp(y);
     else
         x = x - d .* y / 2^i;
         y = y + d .* temp / 2^i;
@@ -82,12 +81,18 @@ for i = (0:p.Results.Iterations-1)
 end
 
 %% Output
-r = x;
-r(sx) = -r(sx);
+x(sx) = -x(sx);
+r = zeros(size(x));
 % Compensation for vector length scaling
 if p.Results.CompensationScaling
     K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations - 1))));
-    r = K * r;
+    K = round(K * 2^p.Results.CompensationBins);
+    K = dec2bin(K, p.Results.CompensationBins);
+    for i = 1:p.Results.CompensationBins
+        if K(i) == '1'
+            r = r + floor(x * 2^-i);
+        end
+    end
 end
 
 % Compensation for phase angle output

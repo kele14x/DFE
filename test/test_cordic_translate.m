@@ -6,7 +6,8 @@ close all;
 % Paramters for model
 InputWordLength = 16;
 InputFractionLength = 15;
-CompensationScaling = false;
+CompensationScaling = true;
+CompensationBins = 8;
 Iterations = 7;
 PhaseFormat = 'Binary';
 RoundMode = 'Truncate';
@@ -24,12 +25,13 @@ yin = randi(rg, sz);
 
 %% Test
 % DUT
-[thetab, r] = cordic_translate(xin, yin, ...
+[theta, r] = cordic_translate(xin, yin, ...
     'CompensationScaling', CompensationScaling, ...
+    'CompensationBins', CompensationBins, ...
     'Iterations', Iterations, ...
     'PhaseFormat', PhaseFormat, ...
     'RoundMode', RoundMode);
-theta = cordic_bin2rad(thetab, Iterations);
+theta_rad = cordic_bin2rad(theta, Iterations);
 
 % Referernce
 vec = complex(xin, yin);
@@ -48,9 +50,12 @@ legend('Input', 'Output', 'Error');
 figure();
 stem(theta_ref * 180 / pi);
 hold on;
-stem(theta * 180 / pi);
-stem((theta_ref - theta) * 180 / pi);
-title(sprintf('Angle Error (RMS = %.4f degree)', rms(theta_ref-theta) * 180 / pi));
+stem(theta_rad * 180 / pi);
+theta_err = theta_ref - theta_rad;
+theta_err(theta_err > pi) = theta_err(theta_err > pi) - 2 * pi;
+theta_err(theta_err < -pi) = theta_err(theta_err < -pi) + 2 * pi;
+stem(theta_err * 180 / pi);
+title(sprintf('Angle Error (RMS = %.4f degree)', rms(theta_err) * 180 / pi));
 legend('Input', 'Output', 'Error');
 
 %% Write Text File
@@ -59,5 +64,5 @@ writehex(xin, fullfile(dfepath(), './data/test_cordic_translate_input_xin.txt'),
 writehex(yin, fullfile(dfepath(), './data/test_cordic_translate_input_yin.txt'), InputWordLength);
 
 % Golden output
-writehex(thetab, fullfile(dfepath(), './data/test_cordic_translate_output_thetab.txt'), Iterations+1);
+writehex(theta, fullfile(dfepath(), './data/test_cordic_translate_output_thetab.txt'), Iterations+1);
 writehex(r, fullfile(dfepath(), './data/test_cordic_translate_output_r.txt'), InputWordLength+1);
