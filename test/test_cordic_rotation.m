@@ -1,20 +1,23 @@
-%% Clear
+%% Configurations
 clc;
 clearvars;
 close all;
 
-%% Generate Test Input
-nPts = 1000;
-sz = [nPts, 1];
-
-CompensationScaling = true;
+InputWordLength = 16;
+InputFractionLength = 15;
+CompensationScaling = 'AddSub';
 Iterations = 7;
 PhaseFormat = 'Binary';
-RoundMode = 'None';
+RoundMode = 'Truncate';
+
+nPts = 1000;
+
+%% Generate Test Input
+sz = [nPts, 1];
 
 rng(12345);
-xin = randi([-2^15, 2^15-1], sz);
-yin = randi([-2^15, 2^15-1], sz);
+xin = randi([-2^(InputWordLength-1), 2^(InputWordLength-1)-1], sz);
+yin = randi([-2^(InputWordLength-1), 2^(InputWordLength-1)-1], sz);
 theta = rand(sz) * 2 * pi - pi;
 thetab = cordic_rad2bin(theta, Iterations);
 
@@ -46,3 +49,13 @@ stem(yout_ref);
 stem(yout_ref - yout);
 legend('Reference', 'Output', 'Error');
 title(sprintf('Error RMS is %.4f%%\n', rms(yout_ref-yout)/rms(yout_ref)*100));
+
+%% Write Text File
+% Test input
+writehex(xin, fullfile(dfepath(), './data/test_cordic_rotation_input_xin.txt'), InputWordLength);
+writehex(yin, fullfile(dfepath(), './data/test_cordic_rotation_input_yin.txt'), InputWordLength);
+writehex(thetab, fullfile(dfepath(), './data/test_cordic_rotation_input_theta.txt'), Iterations+1);
+
+% Golden output
+writehex(xout, fullfile(dfepath(), './data/test_cordic_rotation_output_xout.txt'), InputWordLength+2);
+writehex(yout, fullfile(dfepath(), './data/test_cordic_rotation_output_yout.txt'), InputWordLength+2);

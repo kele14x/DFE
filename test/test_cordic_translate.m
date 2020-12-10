@@ -6,8 +6,7 @@ close all;
 % Paramters for model
 InputWordLength = 16;
 InputFractionLength = 15;
-CompensationScaling = true;
-CompensationBins = 8;
+CompensationScaling = 'AddSub';
 Iterations = 7;
 PhaseFormat = 'Binary';
 RoundMode = 'Truncate';
@@ -27,7 +26,6 @@ yin = randi(rg, sz);
 % DUT
 [theta, r] = cordic_translate(xin, yin, ...
     'CompensationScaling', CompensationScaling, ...
-    'CompensationBins', CompensationBins, ...
     'Iterations', Iterations, ...
     'PhaseFormat', PhaseFormat, ...
     'RoundMode', RoundMode);
@@ -64,5 +62,5 @@ writehex(xin, fullfile(dfepath(), './data/test_cordic_translate_input_xin.txt'),
 writehex(yin, fullfile(dfepath(), './data/test_cordic_translate_input_yin.txt'), InputWordLength);
 
 % Golden output
-writehex(theta, fullfile(dfepath(), './data/test_cordic_translate_output_thetab.txt'), Iterations+1);
-writehex(r, fullfile(dfepath(), './data/test_cordic_translate_output_r.txt'), InputWordLength+1);
+writehex(theta, fullfile(dfepath(), './data/test_cordic_translate_output_theta.txt'), Iterations+1);
+writehex(r, fullfile(dfepath(), './data/test_cordic_translate_output_r.txt'), InputWordLength+2);

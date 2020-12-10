@@ -32,8 +32,7 @@ function [theta, r] = cordic_translate(x, y, varargin)
 %% Parse Arguments
 p = inputParser;
 
-addParameter(p, 'CompensationScaling', true, @(x)(isscalar(x) && islogical(x)));
-addParameter(p, 'CompensationBins', 8, @(x)(isscalar(x) && isnumeric(x)));
+addParameter(p, 'CompensationScaling', 'Multiply', @(x)(ismember(x, {'Multiply', 'AddSub', 'None'})));
 addParameter(p, 'Iterations', 7, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'PhaseFormat', 'Radians', @(x)(ismember(x, {'Radians', 'Binary'})));
 addParameter(p, 'RoundMode', 'None', @(x)(ismember(x, {'Truncate', 'None'})));
@@ -68,7 +67,6 @@ for i = (0:p.Results.Iterations-1)
         x = x - d .* y / 2^i;
         y = y + d .* temp / 2^i;
     end
-
     % Angle Log
     if strcmp(p.Results.PhaseFormat, 'Radians')
         % If we rotate clockwise, we log positive, and vice versa
@@ -82,16 +80,21 @@ end
 
 %% Output
 x(sx) = -x(sx);
-r = zeros(size(x));
+r = x;
 % Compensation for vector length scaling
-if p.Results.CompensationScaling
+if strcmp(p.Results.CompensationScaling, 'Multiply')
     K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations - 1))));
-    K = round(K * 2^p.Results.CompensationBins);
-    K = dec2bin(K, p.Results.CompensationBins);
-    for i = 1:p.Results.CompensationBins
-        if K(i) == '1'
-            r = r + floor(x * 2^-i);
-        end
+    r = r * K;
+    if strcmp(p.Results.RoundMode, 'Truncate')
+        r = floor(r);
+    end
+elseif strcmp(p.Results.CompensationScaling, 'AddSub')
+    if strcmp(p.Results.RoundMode, 'Truncate')
+        r = floor(r / 2) + floor(r / 8);
+        r = r - floor(r / 32);
+    else
+        r = r / 2 + r / 8;
+        r = r - r / 32;
     end
 end
 
