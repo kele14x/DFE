@@ -71,7 +71,6 @@ for i = (0:p.Results.Iterations-1)
     if strcmp(p.Results.PhaseFormat, 'Radians')
         % If we rotate clockwise, we log positive, and vice versa
         theta = theta - d .* atan(1 / 2^i);
-        disp(theta * 180 / pi);
     elseif strcmp(p.Results.PhaseFormat, 'Binary')
         %  If we rotate clockwise, we log '1', and vice versa
         theta = theta * 2 - (d - 1) / 2;
