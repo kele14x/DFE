@@ -52,7 +52,7 @@ if strcmp(p.Results.PhaseFormat, 'Binary')
 end
 
 %% Pseudo-Rotation
-for i = (0:p.Results.Iterations-1)
+for i = (0:p.Results.Iterations - 1)
     % `d` is rotation direction, 1 is counterclockwise, -1 is clockwise. The
     % rotation direction is -sign(x*y). For 0, we rotate counterclockwise.
     d = xor(x < 0, y < 0);
@@ -61,8 +61,8 @@ for i = (0:p.Results.Iterations-1)
     temp = x;
     % Simulation the hardware truncate rounding mode
     if strcmp(p.Results.RoundMode, 'Truncate')
-        x = x - d .* floor(y / 2^i);
-        y = y + d .* floor(temp / 2^i);
+        x = x - d .* floor(y/2^i);
+        y = y + d .* floor(temp/2^i);
     else
         x = x - d .* y / 2^i;
         y = y + d .* temp / 2^i;
@@ -70,7 +70,7 @@ for i = (0:p.Results.Iterations-1)
     % Angle Log
     if strcmp(p.Results.PhaseFormat, 'Radians')
         % If we rotate clockwise, we log positive, and vice versa
-        theta = theta - d .* atan(1 / 2^i);
+        theta = theta - d .* atan(1/2^i);
     elseif strcmp(p.Results.PhaseFormat, 'Binary')
         %  If we rotate clockwise, we log '1', and vice versa
         theta = theta * 2 - (d - 1) / 2;
@@ -82,15 +82,15 @@ x(sx) = -x(sx);
 r = x;
 % Compensation for vector length scaling
 if strcmp(p.Results.CompensationScaling, 'Multiply')
-    K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations - 1))));
+    K = prod(1./sqrt(1+2.^(-2 * (0:p.Results.Iterations - 1))));
     r = r * K;
     if strcmp(p.Results.RoundMode, 'Truncate')
         r = floor(r);
     end
 elseif strcmp(p.Results.CompensationScaling, 'AddSub')
     if strcmp(p.Results.RoundMode, 'Truncate')
-        r = floor(r / 2) + floor(r / 8);
-        r = r - floor(r / 32);
+        r = floor(r/2) + floor(r/8);
+        r = r - floor(r/32);
     else
         r = r / 2 + r / 8;
         r = r - r / 32;

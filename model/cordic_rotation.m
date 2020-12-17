@@ -59,27 +59,27 @@ if strcmp(p.Results.PhaseFormat, 'Radians')
     theta(sx & sy) = theta(sx & sy) + pi;
     theta(sx & ~sy) = theta(sx & ~sy) - pi;
 elseif strcmp(p.Results.PhaseFormat, 'Binary')
-    theta = dec2bin(theta, p.Results.Iterations + 1);
+    theta = dec2bin(theta, p.Results.Iterations+1);
     sx = (theta(:, 1) == '1');
     % We does not need sy here
 end
 
 %% Pseudo-Rotation
-for i = (0:p.Results.Iterations-1)
+for i = (0:p.Results.Iterations - 1)
     % Rotation direction is sgn(theta).
     if strcmp(p.Results.PhaseFormat, 'Radians')
         d = (theta >= 0) * 2 - 1;
-        theta = theta - d .* atan(1 / 2^i);
+        theta = theta - d .* atan(1/2^i);
     elseif strcmp(p.Results.PhaseFormat, 'Binary')
-        d = (theta(:, 2 + i) == '1') * 2 - 1;
+        d = (theta(:, 2+i) == '1') * 2 - 1;
     end
-
+    
     % Pseudo rotation is micro rotation without the length factor K
     temp = xin;
     if strcmp(p.Results.RoundMode, 'Truncate')
         % Simulation the hardware truncate rounding mode
-        xin = xin - d .* floor(yin / 2^i);
-        yin = yin + d .* floor(temp / 2^i);
+        xin = xin - d .* floor(yin/2^i);
+        yin = yin + d .* floor(temp/2^i);
     else
         xin = xin - d .* yin / 2^i;
         yin = yin + d .* temp / 2^i;
@@ -95,7 +95,7 @@ yout(sx) = -yout(sx);
 
 % Compensation for vector length scaling
 if strcmp(p.Results.CompensationScaling, 'Multiply')
-    K = prod(1 ./ sqrt(1 + 2.^(-2 * (0:p.Results.Iterations-1))));
+    K = prod(1./sqrt(1+2.^(-2 * (0:p.Results.Iterations - 1))));
     xout = K * xout;
     yout = K * yout;
     if strcmp(p.Results.RoundMode, 'Truncate')
@@ -104,10 +104,10 @@ if strcmp(p.Results.CompensationScaling, 'Multiply')
     end
 elseif strcmp(p.Results.CompensationScaling, 'AddSub')
     if strcmp(p.Results.RoundMode, 'Truncate')
-        xout = floor(xout / 2) + floor(xout / 8);
-        xout = xout - floor(xout / 32);
-        yout = floor(yout / 2) + floor(yout / 8);
-        yout = yout - floor(yout / 32);
+        xout = floor(xout/2) + floor(xout/8);
+        xout = xout - floor(xout/32);
+        yout = floor(yout/2) + floor(yout/8);
+        yout = yout - floor(yout/32);
     else
         xout = xout / 2 + xout / 8;
         xout = xout - xout / 32;

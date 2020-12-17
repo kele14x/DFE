@@ -16,7 +16,7 @@ end
 A = rem(A, 2^bitWidth);
 
 % From R2020a dec2hex could handle negative numbers using two's complement
-% binary values, but it does not produce arbitrary bit width. So manual 
+% binary values, but it does not produce arbitrary bit width. So manual
 % converation is still needed.
 A(A < 0) = A(A < 0) + 2^bitWidth;
 

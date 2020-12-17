@@ -3,7 +3,7 @@ function [y] = nco_model(x, Fs, f, d)
 %
 %   y = nco_model(x, Fs, f);
 %   y = nco_model(x, Fs, f, d);
-% 
+%
 % x is input signal. Fs is sample frequency of x. f is NCO shift frequency.
 % d is optional reset pointe of NCO. If provide as a scalar, the complex
 % phase of NCO will be reset at the time index.
@@ -23,12 +23,12 @@ end
 % Size of input
 n = size(x, 1);
 
-tv = ((0:n-1)-d).'/Fs;
+tv = ((0:n - 1) - d).' / Fs;
 
 y = x .* exp(2j*pi*tv*f);
 
 if input_is_row
     y = y.';
-end 
+end
 
 end

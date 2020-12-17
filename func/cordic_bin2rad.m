@@ -25,17 +25,17 @@ sz = size(bin);
 bin = bin(:);
 
 % Convert to logic matrix
-bin = (dec2bin(bin, nIter+1) == '1');
+bin = (dec2bin(bin, nIter + 1) == '1');
 
 % MSB is marked as theta is reversed
-reversed = bin(:,1);
+reversed = bin(:, 1);
 
 % Left bits are angle in atan(1/2^i)
 bin = bin(:, 2:end);
 
 % Add left bits together to get the theta
 bin = bin * 2 - 1;
-t = meshgrid(0:size(bin,2)-1, 1:size(bin,1));
+t = meshgrid(0:size(bin, 2)-1, 1:size(bin, 1));
 theta = bin .* atan(1./2.^t);
 theta = sum(theta, 2);
 

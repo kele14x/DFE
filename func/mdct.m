@@ -39,12 +39,12 @@ N = size(x, 1) / 2;
 [k, n] = ndgrid(0:N-1, 0:2*N-1);
 
 % Unwindowed coe
-C = cos(pi / N .* (n + 1/2 + N/2) .* (k + 1/2));
+C = cos(pi / N .* (n + 1 / 2 + N / 2) .* (k + 1 / 2));
 
 if strcmp(w, 'mlt')
-    C = C .* sin(pi/2/N*(n+1/2));
+    C = C .* sin(pi/2/N*(n + 1 / 2));
 elseif strcmp(w, 'mlt2')
-    C = C.* sin(pi/2*sin(pi/2/N*(n+1/2)).^2);
+    C = C .* sin(pi/2*sin(pi / 2 / N * (n + 1 / 2)).^2);
 end
 
 % dimension [N 2N] * [2N (?)] = [N (?)]
@@ -54,4 +54,3 @@ y = C * x;
 if row
     y = y.';
 end
-

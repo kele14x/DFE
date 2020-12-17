@@ -18,7 +18,7 @@ function bin = cordic_rad2bin(theta, nIter)
 % Copyright 2020 kele14x
 
 % Make theta in range [-pi, pi)
-theta = rem(theta + pi, 2 * pi) - pi;
+theta = rem(theta+pi, 2*pi) - pi;
 
 % If the vector is at 2nd or 3rd quadrant (not including y axis), it's
 % reversed to make the angle phase be in range [-pi/2, pi/2].
@@ -29,7 +29,7 @@ bin = idx1 | idx2;
 theta(idx1) = theta(idx1) - pi;
 theta(idx2) = theta(idx2) + pi;
 
-for i = 0:nIter-1
+for i = 0:nIter - 1
     % d = 1, rotate counterclockwise; d = -1, rotate clockwise
     d = (theta >= 0) * 2 - 1;
     theta = theta - d * atan(1/2^i);

@@ -14,6 +14,6 @@ if nargout == 0
     plot(fp, 10*log10(Pxx));
     xlim([min(fp), max(fp)]);
     grid on;
-end 
+end
 
 end

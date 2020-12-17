@@ -34,7 +34,7 @@ x = ofdm100.waveform(1:4096);
 Fs = ofdm100.Fs;
 
 % Hard clipping threshold
-threshold = round(sqrt(db2l(-7.5)) * 2^15);
+threshold = round(sqrt(db2l(-7.5))*2^15);
 
 %% Test
 y = cfr_hardclipping(x, threshold);

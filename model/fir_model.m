@@ -8,10 +8,10 @@ if isrow(x)
 end
 
 y = circ_filter(num, x);
-y = circshift(y, -(length(num)-1)/2);
+y = circshift(y, -(length(num) - 1)/2);
 
 if input_is_row
     y = y.';
-end 
+end
 
 end

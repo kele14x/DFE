@@ -1,22 +1,23 @@
 function [dn, g] = loop_calc(x, z, from, to, valid)
 % use maximum match method to search loop delay
-% 
+%
 % [dn, g] = loop_calc(x, z, from, to, valid)
 
 figure_on = true;
 
-er = zeros(1, to - from);
+er = zeros(1, to-from);
 % integer delay
-for n = from : to - 1
+for n = from:to - 1
     xd = sigdelay(x, n);
-    [er(n+1 - from), ~] = ercal(xd, z, valid);
-    
+    [er(n + 1 - from), ~] = ercal(xd, z, valid);
+
     disp_wait(figure_on, '*');
 end
 
 disp_wait(figure_on, '\n');
 
-figure; plot(abs(er), '.-k');
+figure;
+plot(abs(er), '.-k');
 
 [~, mn] = min(er);
 dn_int = mn - 1 + from;
@@ -25,16 +26,16 @@ er = zeros(1, 64*2);
 gn = zeros(1, 64*2);
 % fractional delay
 for n = -64:63
-    xd = sigdelay(x, dn_int + n/64);
-    [er(n+65), gn(n+65)] = ercal(xd, z, valid);
-    
+    xd = sigdelay(x, dn_int+n/64);
+    [er(n + 65), gn(n + 65)] = ercal(xd, z, valid);
+
     disp_wait(figure_on, '+');
 end
 
 disp_wait(figure_on, '\n');
 
 [~, mn] = min(er);
-dn_fra = (mn - 65)/64;
+dn_fra = (mn - 65) / 64;
 
 % result
 dn = dn_int + dn_fra;
@@ -60,7 +61,9 @@ end
 function disp_wait(figure_on, ch)
 
 persistent id_
-if (isempty(id_)); id_ = 0; end
+if (isempty(id_));
+    id_ = 0;
+end
 id_ = id_ + 1;
 
 if strcmp(ch, '\n')

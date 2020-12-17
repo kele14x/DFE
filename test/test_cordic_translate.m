@@ -16,7 +16,7 @@ nPts = 1000;
 
 %% Generate Test Input
 sz = [nPts, 1];
-rg = [-2^(InputWordLength-1), 2^(InputWordLength-1)-1];
+rg = [-2^(InputWordLength - 1), 2^(InputWordLength - 1) - 1];
 
 rng(12345);
 xin = randi(rg, sz);
@@ -41,18 +41,18 @@ figure();
 stem(r_ref);
 hold on;
 stem(r);
-stem(r_ref - r);
-title(sprintf('Magnitude Error (RMS = %.4f%%)', rms(r_ref-r)/rms(r_ref)*100));
+stem(r_ref-r);
+title(sprintf('Magnitude Error (RMS = %.4f%%)', rms(r_ref - r) / rms(r_ref) * 100));
 legend('Input', 'Output', 'Error');
 
 figure();
-stem(theta_ref * 180 / pi);
+stem(theta_ref*180/pi);
 hold on;
-stem(theta_rad * 180 / pi);
+stem(theta_rad*180/pi);
 theta_err = theta_ref - theta_rad;
 theta_err(theta_err > pi) = theta_err(theta_err > pi) - 2 * pi;
 theta_err(theta_err < -pi) = theta_err(theta_err < -pi) + 2 * pi;
-stem(theta_err * 180 / pi);
+stem(theta_err*180/pi);
 title(sprintf('Angle Error (RMS = %.4f degree)', rms(theta_err) * 180 / pi));
 legend('Input', 'Output', 'Error');
 

@@ -11,7 +11,7 @@ function p = cmult(a, b, varargin)
 %   `Name` & 'Value` are Name-Value pairs to hold optional configurations
 %   for this model. Valid arguments are:
 %
-%     `RightShiftBits` Scalar integer, arithmetic right shift bits on
+%     `RightShiftBits`: Scalar integer, arithmetic right shift bits on
 %     output
 %
 %     `RoundMode`: 'Truncate', 'PositiveInfinity' or 'None'
@@ -28,7 +28,8 @@ function p = cmult(a, b, varargin)
 p = inputParser;
 
 addParameter(p, 'RightShiftBits', 0, @(x)(isscalar(x) && isnumeric(x)));
-addParameter(p, 'RoundMode', 'None', @(x)(ismember(x, {'Truncate', 'PositiveInfinity', 'None'})));
+addParameter(p, 'RoundMode', 'None', ...
+    @(x)(ismember(x, {'Truncate', 'PositiveInfinity', 'None'})));
 
 parse(p, varargin{:});
 
@@ -44,8 +45,8 @@ if strcmp(p.Results.RoundMode, 'Truncate')
     pr = floor(pr);
     pi = floor(pi);
 elseif strcmp(p.Results.RoundMode, 'PositiveInfinity')
-    pr = floor(pr + 0.5);
-    pi = floor(pi + 0.5);
+    pr = floor(pr+0.5);
+    pi = floor(pi+0.5);
 end
 
 p = complex(pr, pi);

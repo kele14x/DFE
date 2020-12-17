@@ -4,18 +4,17 @@ function easy_fft(x, Fs)
 
 n = length(x);
 
-if ~exist('Fs','var') || isempty(Fs)
-  Fs=2;
+if ~exist('Fs', 'var') || isempty(Fs)
+    Fs = 2;
 end
 
 if rem(n, 2) % odd
-    v = (((1-n)/2):((n-1)/2))*Fs/n;
+    v = (((1 - n) / 2):((n - 1) / 2)) * Fs / n;
 else % even
-    v = ((-n/2):(n/2-1))*Fs/n;
+    v = ((-n / 2):(n / 2 - 1)) * Fs / n;
 end
 
 figure();
-plot(v, 20*log10(fftshift(abs(fft(x)))/n));
+plot(v, 20*log10(fftshift(abs(fft(x))) / n));
 
 end
-

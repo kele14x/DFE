@@ -27,7 +27,7 @@ if isempty(p.Results.CPW)
     cpw1 = cpw(2:2:end);
     cpw2 = cpw(1:2:end);
     delay = 63;
-else 
+else
     cpw = p.Results.CPW;
     [~, delay] = max(cpw);
 end
@@ -63,12 +63,12 @@ peak = complex(peaki, peakq);
 peak = reshape(peak, 2, []).';
 
 delta = zeros(size(peak));
-delta(:,1) = cconv(cpw1, peak(:,1), length(peak(:,1)));
-delta(:,2) = cconv(cpw2, peak(:,2), length(peak(:,2)));
-delta = circshift(delta, -delay); 
+delta(:, 1) = cconv(cpw1, peak(:, 1), length(peak(:, 1)));
+delta(:, 2) = cconv(cpw2, peak(:, 2), length(peak(:, 2)));
+delta = circshift(delta, -delay);
 
 y = x;
-y = y - delta(:,1);
-y = y - delta(:,2);
+y = y - delta(:, 1);
+y = y - delta(:, 2);
 
 end

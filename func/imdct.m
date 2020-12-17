@@ -36,13 +36,13 @@ N = size(x, 1);
 
 % Coefficients matrix with 2*N*N size
 [n, k] = ndgrid(0:2*N-1, 0:N-1);
-C = cos(pi / N .* (n + 1/2 + N/2) .* (k + 1/2));
+C = cos(pi / N .* (n + 1 / 2 + N / 2) .* (k + 1 / 2));
 
 if strcmp(w, 'mlt')
-    C = C .* sin(pi/2/N*(n+1/2));
+    C = C .* sin(pi/2/N*(n + 1 / 2));
 elseif strcmp(w, 'mlt2')
-    C = C.* sin(pi/2*sin(pi/2/N*(n+1/2)).^2);
-end 
+    C = C .* sin(pi/2*sin(pi / 2 / N * (n + 1 / 2)).^2);
+end
 
 % Dimension: [2N, N] * [N (?)]  = [2N (?)]
 % Accumulation works on first dimension
@@ -50,4 +50,4 @@ y = 1 / N * C * x;
 
 if row
     y = y.';
-end 
+end

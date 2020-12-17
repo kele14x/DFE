@@ -7,7 +7,7 @@ function b = hb_design(N, Fs, Fpass)
 % Fpass is passband frequency
 
 % Calculate the coefficients using the firhalfband function.
-b = firhalfband(N, Fpass/(Fs/2));
+b = firhalfband(N, Fpass/(Fs / 2));
 
 if nargout < 1
 
@@ -16,10 +16,10 @@ if nargout < 1
     [h, f] = freqz(b, 1, Npts, Fs);
 
     passband = h(f <= Fpass);
-    ripple = 20*log10(max(abs(passband))) - 20*log10(min(abs(passband)));
+    ripple = 20 * log10(max(abs(passband))) - 20 * log10(min(abs(passband)));
     stopband = h(f >= Fs/2-Fpass);
-    rejection = 20*log10(max(abs(stopband)));
-    
+    rejection = 20 * log10(max(abs(stopband)));
+
     plot(f/1e6, 20*log10(abs(h)));
     grid on;
     title('Halfband Filter');
@@ -28,7 +28,7 @@ if nargout < 1
     annotation('textbox', 'String', txt, 'BackgroundColor', 'w', 'FaceAlpha', .6);
     xlabel('Frequency (MHz)');
     ylabel('Response (dB)');
-    xlim([0, Fs/2e6]);
+    xlim([0, Fs / 2e6]);
 
     xline(Fpass/1e6, '--r');
     xline(Fs/1e6/2-Fpass/1e6, '--r');
