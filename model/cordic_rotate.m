@@ -1,9 +1,9 @@
-function [xout, yout] = cordic_rotation(xin, yin, theta, varargin)
-% CORDIC_ROTATION rotates the vector (xin, yin) through the angle theta to yield
+function [xout, yout] = cordic_rotate(xin, yin, theta, varargin)
+% CORDIC_ROTATE rotates the vector (xin, yin) through the angle theta to yield
 % a new vector (xout, yout) using CORDIC algorithm.
 %
-%   [xout, yout] = CORDIC_ROTATION(xin, yin, theta)
-%   [xout, yout] = CORDIC_ROTATION(xin, yin, theta, Name, Value)
+%   [xout, yout] = CORDIC_ROTATE(xin, yin, theta)
+%   [xout, yout] = CORDIC_ROTATE(xin, yin, theta, Name, Value)
 %
 % Input Arguments:
 %
