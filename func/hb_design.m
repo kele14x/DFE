@@ -1,6 +1,6 @@
 function b = hb_design(N, Fs, Fpass)
 % Halfband Filter (HB) design.
-%   b = hb1_design(N, Fs, Fpass);
+%   b = hb_design(N, Fs, Fpass);
 %
 % N is filter order (filter tap is N + 1)
 % Fs is sample frequency

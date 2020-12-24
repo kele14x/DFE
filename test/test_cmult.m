@@ -14,6 +14,10 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+%%
+% File: test_cmult.m
+% Brief: Test bench for function cmult
+
 %% Clear
 clc;
 clearvars;
