@@ -1,15 +1,3 @@
-% Copyright (C) 2020  kele14x
-%
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-
 function y = cfr_hardclipping(x, threshold, varargin)
 % CFR_HARDCLIPPING performs brick-wall dynamic range limiting to input. Dynamic
 % range limiting suppresses the signal that cross a given threshold. Those
@@ -18,7 +6,7 @@ function y = cfr_hardclipping(x, threshold, varargin)
 %   y = cfr_hardclipping(x, threshold)
 %   y = cfr_hardclipping(x, threshold, Name, Value)
 %
-% See also CFR.
+% See also CFR_SOFTCLIPPING.
 
 % Copyright 2020 kele14x
 
