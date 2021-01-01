@@ -20,7 +20,7 @@ rng(12345);
 [x1, conf1] = nrWaveGen('100');
 [x2, ~] = nrWaveGen('100');
 
-Fs = conf1 * 2;
+Fs = conf1.Fs * 2;
 
 % OFDM100 will use 122.88 Msps sampling rate, we need upsample to 2x. So we need
 % a halfband lowpass filter
@@ -29,8 +29,8 @@ b = hb_design(54, Fs, 50e6);
 % Filter and compensate the filter delay
 c1 = cfilter(b, upsample(x1, 2));
 c2 = cfilter(b, upsample(x2, 2));
-c1 = circshift(c1, -(length(num) - 1)/2);
-c2 = circshift(c2, -(length(num) - 1)/2);
+c1 = circshift(c1, -(length(b) - 1)/2);
+c2 = circshift(c2, -(length(b) - 1)/2);
 
 % Frequecy shift and combine of two carriers
 waveform = nco_model(c1, Fs, -50e6) + nco_model(c2, Fs, 50e6);
