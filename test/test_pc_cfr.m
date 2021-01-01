@@ -11,8 +11,8 @@
 % GNU General Public License for more details.
 
 %%
-% File: test_cfr_softclipping.m
-% Brief: Test bench for function cfr_softclipping
+% File: test_pc_cfr.m
+% Brief: Test bench for model PC_CFR
 
 %% Configurations
 clc;
@@ -53,13 +53,13 @@ hb1 = hb_design(18, Fs*2, BW/2);
 hb1 = round(hb1 * 2 * 2^15);
 
 %% Test
-y = pc_cfr_model(x, ...
+y = PC_CFR(x, ...
     'HB1', hb1, ...
     'Threshold', threshold, ...
     'CancellationPulse', cPulse, ...
     'RoundMode', 'Truncate');
 
-%%
+%% Analysis
 evm(x, y);
 
 figure();
@@ -67,11 +67,19 @@ plot(abs(x));
 hold on;
 plot(abs(y));
 yline(threshold);
+grid on;
+
+figure();
+ccdf(x);
+hold on;
+ccdf(y);
 
 figure();
 mypsd(x, Fs);
 hold on;
 mypsd(y, Fs);
+
+
 
 %% Write Text File
 % writehex(real(x), fullfile(dfepath(), './data/test_cfr_softclipping_data_i_in.txt'), 16);

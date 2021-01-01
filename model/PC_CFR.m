@@ -1,30 +1,28 @@
-function y = pc_cfr_model(x, varargin)
-% CFR_SOFTCLIPPING performs performs PC-CFR on input signal
+function y = PC_CFR(x, varargin)
+% PC_CFR performs Peak Cancellation Crest Factor Reduction (PC-CFR) on 
+% input signal.
 %
-%   y = cfr_softclipping(x, threshold, cPulse)
-%   y = cfr_softclipping(x, threshold, cPulse, Name, Value)
+%   y = PC_CFR(x)
+%   y = PC_CFR(x, Name, Value)
 %
 % Input Arguments:
 %
 %   `x` is input complex waveform
 %
-%   `threhold` is peak detection and clipping threshold
-%
-%   `cPulse` is cancellation pulse of Cancellation Pulse Generators (CPG)
-%
 %   `Name` & 'Value` are Name-Value pairs to hold optional configurations
 %   for this model. Valid arguments are:
 %
-%     `RightShiftBits`: Scalar integer, arithmetic right shift bits on
-%     output
+%     `HB1`: Vector, coefficient for first halfband filter
 %
-%     `RoundMode`: 'Truncate', 'PositiveInfinity' or 'None'
+%     `Threshold`: Scalar, threshold peak detection and clipping
+%
+%     `CancellationPulse`: Vector, cancellation pulse waveform
+%
+%     `RoundMode`: 'Truncate' or 'None'
 %
 %  Output Arguments:
 %
-%     `p` is complex multiply product of `a` and `b`
-%
-%     `ovf` is overflow indicator
+%     `y` is complex waveform after clipping
 %
 % See also CFR_HARDCLIPPING.
 
