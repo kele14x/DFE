@@ -40,8 +40,7 @@ parse(p, varargin{:});
 
 %% Reshape Cancellation Pulse
 cPulse = p.Results.CancellationPulse;
-delay = (length(cPulse) - 1) / 4;
-cPulse = [0, cPulse];
+delay = (length(cPulse) - 2) / 4;
 
 cPulse1 = cPulse(2:2:end);
 cPulse2 = cPulse(1:2:end);
@@ -89,8 +88,8 @@ peak = complex(peaki, peakq);
 peak = reshape(peak, 2, []).';
 
 delta = zeros(size(peak));
-delta(:, 1) = cconv(cPulse1, peak(:, 1), length(peak(:, 1))) / 2^15;
-delta(:, 2) = cconv(cPulse2, peak(:, 2), length(peak(:, 2))) / 2^15;
+delta(:, 1) = floor(cconv(cPulse1, peak(:, 1), length(peak(:, 1))) / 2^14);
+delta(:, 2) = floor(cconv(cPulse2, peak(:, 2), length(peak(:, 2))) / 2^14);
 delta = circshift(delta, -delay);
 
 y = x;
