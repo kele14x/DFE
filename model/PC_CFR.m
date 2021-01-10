@@ -32,7 +32,9 @@ function y = PC_CFR(x, varargin)
 p = inputParser;
 
 addParameter(p, 'HB1', [], @(x)(isnumeric(x) && isvector(x)));
-addParameter(p, 'Threshold', [], @(x)(isnumeric(x) && isscalar(x)));
+addParameter(p, 'DetectionThreshold', [], @(x)(isnumeric(x) && isscalar(x)));
+addParameter(p, 'ClippingThreshold', [], @(x)(isnumeric(x) && isscalar(x)));
+addParameter(p, 'NumberOfCPG', 6, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'CancellationPulse', [], @(x)(isnumeric(x) && isvector(x)));
 addParameter(p, 'RoundMode', 'None', @(x)(ismember(x, {'Truncate', 'None'})));
 
@@ -65,31 +67,33 @@ x2 = hb_up2(x, hb1, ...
     'Iterations', 7, ...
     'CompensationScaling', 'AddSub', ...
     'PhaseFormat', 'Binary', ...
-    'RoundMode', 'None');
+    'RoundMode', 'Truncate');
 
 % Peak Detector
-threshold = p.Results.Threshold;
+detectionThreshold = p.Results.DetectionThreshold;
+clippingThreshold = p.Results.ClippingThreshold;
 
 % Peak is defined as sample exceed threshold and larger than neighbors
-is_peak = x2_r > threshold;
+is_peak = x2_r > detectionThreshold;
 is_peak = is_peak & (x2_r > circshift(x2_r, 1));
 is_peak = is_peak & (x2_r > circshift(x2_r, -1));
+is_peak_pp = reshape(is_peak, 2, []).';
 
 % Get the peak value exceed threshold
-peak = x2_r - threshold;
+peak = x2_r - clippingThreshold;
 peak(~is_peak) = 0;
 [peaki, peakq] = cordic_rotate(peak, 0, x2_thetab, ...
     'Iterations', 7, ...
     'CompensationScaling', 'AddSub', ...
     'PhaseFormat', 'Binary', ...
-    'RoundMode', 'None');
+    'RoundMode', 'Truncate');
 peak = complex(peaki, peakq);
 
 peak = reshape(peak, 2, []).';
 
 delta = zeros(size(peak));
-delta(:, 1) = floor(cconv(cPulse1, peak(:, 1), length(peak(:, 1))) / 2^14);
-delta(:, 2) = floor(cconv(cPulse2, peak(:, 2), length(peak(:, 2))) / 2^14);
+delta(:, 1) = floor(cconv(cPulse1, peak(:, 1), length(peak(:, 1))) / 2^14 + 0.5 + 0.5j);
+delta(:, 2) = floor(cconv(cPulse2, peak(:, 2), length(peak(:, 2))) / 2^14 + 0.5 + 0.5j);
 delta = circshift(delta, -delay);
 
 y = x;
