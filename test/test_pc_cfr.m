@@ -48,12 +48,13 @@ UP = 2;
 % The length of cancellation pulse is required to be 4n+1 length
 n = 63;
 cPulse = fir_design(n*2*UP, Fs*2, BW/2, BW/2+2e6, 1, 'ls');
-cPulse = [0, cPulse];
 cPulse = round(cPulse / max(cPulse) * 2^14);
 
 % Halfband filter hb1
 hb1 = hb_design(18, Fs*2, BW/2);
+hb2 = hb_design( 6, Fs*4, BW/2);
 hb1 = round(hb1 * 2 * 2^15);
+hb2 = round(hb2 * 2 * 2^15);
 
 %% Test
 y = PC_CFR(x, ...
@@ -83,12 +84,9 @@ mypsd(x, Fs);
 hold on;
 mypsd(y, Fs);
 
-z = readmatrix('data/fout.txt');
-z = complex(z(:,1), z(:,2));
-
 %% Write Text File
-writehex(real(cPulse), fullfile(dfepath(), './data/test_pc_cfr_cancellation_pulse_i.txt'), 16);
-writehex(imag(cPulse), fullfile(dfepath(), './data/test_pc_cfr_cancellation_pulse_q.txt'), 16);
+writehex(real([0, cPulse, 0, 0]), fullfile(dfepath(), './data/test_pc_cfr_cancellation_pulse_i.txt'), 16);
+writehex(imag([0, cPulse, 0, 0]), fullfile(dfepath(), './data/test_pc_cfr_cancellation_pulse_q.txt'), 16);
 
 writehex(real(x), fullfile(dfepath(), './data/test_pc_cfr_data_i_in.txt'), 16);
 writehex(imag(x), fullfile(dfepath(), './data/test_pc_cfr_data_q_in.txt'), 16);
