@@ -1,5 +1,5 @@
-# dsp
+# DFE
 
-DSP assist MATLAB functions.
+Digital Front End (DFE) assist MATLAB functions, and more!
 
-Use `addpath` to add the folder **matlab** to path at runtime. Or modify the configuration in GUI to add it permanently.
+Run `setpath.m` in root folder of this project to add necessary folder to MATALB path at runtime. Then explore functions, models and scripts under each folder.
