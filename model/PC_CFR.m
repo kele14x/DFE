@@ -62,7 +62,7 @@ addParameter(p, 'CancellationPulse', [], @(x)(isnumeric(x) && isvector(x)));
 addParameter(p, 'CancellationPulseFractionLength', 14, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'CancellationPulseWordLength', 16, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'ClippingThreshold', [], @(x)(isnumeric(x) && isscalar(x)));
-addParameter(p, 'CoeFractionLength', 16, @(x)(isnumeric(x) && isscalar(x)));
+addParameter(p, 'CoeFractionLength', 15, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'CoeWordLength', 16, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'DetectionThreshold', [], @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'HB1', [], @(x)(isnumeric(x) && isvector(x)));
@@ -71,14 +71,14 @@ addParameter(p, 'InterpolationFactor', 2, @(x)(ismember(x, [1, 2, 4])));
 addParameter(p, 'NumberOfCPG', 6, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'PeakDetectWindow', 3, @(x)(isnumeric(x) && isscalar(x) && rem(x, 2) == 1));
 addParameter(p, 'RoundMode', 'PositiveInfinity', @(x)(ismember(x, {'Truncate', 'PositiveInfinity', 'None'})));
-addparameter(p, 'XFractionLength', 15, @(x)(isnumeric(x) && isscalar(x)));
+addParameter(p, 'XFractionLength', 15, @(x)(isnumeric(x) && isscalar(x)));
 addParameter(p, 'XWordLength', 16, @(x)(isnumeric(x) && isscalar(x)));
 
 parse(p, varargin{:});
 
 %% Configuration & Constants
 CancellationPulse = p.Results.CancellationPulse;
-CancellationPulseFractionLength = p.Resutls.CancellationPulseFractionLength;
+CancellationPulseFractionLength = p.Results.CancellationPulseFractionLength;
 CancellationPulseWordLength = p.Results.CancellationPulseWordLength;
 ClippingThreshold = p.Results.ClippingThreshold;
 CoeFractionLength = p.Results.CoeFractionLength;
@@ -135,7 +135,7 @@ end
 
 if InterpolationFactor == 4
 
-    x_up = hb_up2(x, HB2, ...
+    x_up = hb_up2(x_up, HB2, ...
         'XinWordLength', XWordLength, ...
         'XinFractionLength', XFractionLength, ...
         'CoeWordLength', CoeWordLength, ...
@@ -159,6 +159,9 @@ end
 % Peak Detector
 
 % Peak is defined as sample exceed threshold and larger than N neighbors
+% TODO: there is bug that if two adjacent sample is same (though very rare,
+% but it happens), below peak detection logic will not report both sample
+% as peak.
 N = max(InterpolationFactor-1, (PeakDetectWindow - 1)/2);
 
 is_peak = x_up_r > DetectionThreshold;
@@ -179,13 +182,13 @@ peak = complex(peaki, peakq);
 % Polyphase peak processing
 
 % There will only be 1 is_peak for each polyphase, so we can do this
-is_peak_pp = reshape(is_peak, 2, []).';
+is_peak_pp = reshape(is_peak, InterpolationFactor, []).';
 peak_valid = logical(is_peak_pp*ones(InterpolationFactor, 1));
 
 % The phase of peak is defined as index of polyphase
 peak_phase = is_peak_pp * (0:InterpolationFactor - 1).';
 
-peak_pp = reshape(peak, 2, []).';
+peak_pp = reshape(peak, InterpolationFactor, []).';
 peak_data = peak_pp * ones(InterpolationFactor, 1);
 
 % Peak cancellation waveform generation
