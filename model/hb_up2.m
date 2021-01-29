@@ -78,7 +78,7 @@ y = y / 2^sra;
 if strcmp(p.Results.RoundMode, 'Truncate')
     y = floor(y);
 elseif strcmp(p.Results.RoundMode, 'PositiveInfinity')
-    y = floor(y+0.5);
+    y = floor(y + 0.5 + 0.5j);
 end
 
 ovf = y >= 2^(p.Results.YoutWordLength - 1) | ...
