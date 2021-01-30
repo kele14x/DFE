@@ -19,17 +19,17 @@ clc;
 clearvars;
 close all;
 
-% Load test input, which is a 2C OFDM100 waveform @ 245.76 Msps
+% Load test input, which is a 2C OFDM100 waveform @ 491.52 Msps
 % formatted 16 bit, -15 dBFS
-fn = fullfile(dfepath(), './data/ofdm100_2c_245.mat');
+fn = fullfile(dfepath(), './data/ofdm100_2c_491.mat');
 if ~exist(fn, 'file')
-    gen_ofdm100_2c_245;
+    gen_ofdm100_2c_491;
 end
 data = load(fn);
 
 % Test input
-% x = data.waveform(1:4096);
-x = data.waveform;
+x = data.waveform(1:4096);
+% x = data.waveform;
 
 % Sampling frequency
 Fs = data.Fs;
@@ -39,21 +39,24 @@ threshold_dB = -7.5;
 threshold = round(sqrt(db2l(threshold_dB)) * 2^15);
 
 % Signal Bandwidth
-BW = 198e6;
+BW = 298e6;
 
 % Upsampling factor
-InterpolationFactor = 4;
+InterpolationFactor = 2;
 NumberOfCPG = 6;
 
 % Cancellation pulse
 % Format like fi(1, 16, 14)
 % The length of cancellation pulse is required to be 4n+1 length
 n = 63;
-cPulse = fir_design(n*2*InterpolationFactor, Fs*InterpolationFactor, BW/2, BW/2+2e6, 1, 'ls');
+b = fir_design(n*2*InterpolationFactor, Fs*InterpolationFactor, 48e6, 52e6, 1, 'ls');
+cPulse = b .* exp(2j*pi*(-n*InterpolationFactor:n*InterpolationFactor)*100e6/(Fs*InterpolationFactor)) + ...
+    b .* exp(2j*pi*(-n*InterpolationFactor:n*InterpolationFactor)*-100e6/(Fs*InterpolationFactor));
+
 cPulse = round(cPulse / max(cPulse) * 2^14);
 
 % Halfband filter hb1
-hb1 = hb_design(18, Fs*2, BW/2);
+hb1 = hb_design(10, Fs*2, BW/2);
 hb2 = hb_design( 6, Fs*4, BW/2);
 hb1 = round(hb1 * 2 * 2^15);
 hb2 = round(hb2 * 2 * 2^15);
