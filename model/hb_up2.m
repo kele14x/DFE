@@ -1,4 +1,4 @@
-function [y, ovf] = hb_up2(x, num, varargin)
+function [y, ovf] = hb_up2(x, varargin)
 % HB_UP2 upsample the signal by factor of 2, followed by a halfband
 % lowpass filter.
 %
@@ -34,6 +34,7 @@ function [y, ovf] = hb_up2(x, num, varargin)
 %% Parse Arguments
 p = inputParser;
 
+addParameter(p, 'Coefficients', 1, @(x)(isvector(x) && isnumeric(x)));
 addParameter(p, 'XinWordLength', 0, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'XinFractionLength', 0, @(x)(isscalar(x) && isnumeric(x)));
 addParameter(p, 'CoeWordLength', 0, @(x)(isscalar(x) && isnumeric(x)));
@@ -58,7 +59,7 @@ end
 %% Upsample and Filter
 x = upsample(x, 2);
 
-y = conv(x, num);
+y = conv(x, p.Results.Coefficients);
 
 if p.Results.CompensatePower
     y = y * 2;
@@ -66,7 +67,7 @@ end
 
 latency = 0;
 if p.Results.CompensateDelay
-    latency = (length(num) - 1) / 2;
+    latency = (length(p.Results.Coefficients) - 1) / 2;
 end
 
 y = y(latency+(1:size(x, 1)));
